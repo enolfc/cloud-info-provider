@@ -83,5 +83,7 @@ jobs:
 
           Update RPM and DEB package descriptions and .zenodo.json for
           version ${{  steps.changelog.outputs.version }}
-        label: new-release
+        labels: release
         branch: release-${{ steps.changelog.outputs.version }}
+        title: Release  ${{ steps.changelog.outputs.version }}
+
