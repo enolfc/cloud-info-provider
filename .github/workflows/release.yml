@@ -8,7 +8,7 @@ jobs:
   prepare-release:
     name: Prepare Release
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels, 'release')
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
@@ -136,7 +136,6 @@ jobs:
     needs: [sdist, ubuntu, centos7, prepare-release]
     name: Create Release
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'repository_dispatch' }}
     steps:
       - uses: actions/download-artifact@v2
         with:
@@ -144,10 +143,6 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: rpms
-      - name: Upload base rpm
-        run: |
-          ls -Ra
-          echo ${{ needs.prepare-release.outputs.upload_url }}
       - name: Upload base rpm
         uses: actions/upload-release-asset@v1
         env:
