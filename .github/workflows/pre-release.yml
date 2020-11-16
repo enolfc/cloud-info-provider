@@ -1,4 +1,4 @@
-name: Create packages and release
+name: Prepare new release as PR
 
 on:
   repository_dispatch:
