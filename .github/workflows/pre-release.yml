@@ -48,6 +48,8 @@ jobs:
             sed -i -e "/%changelog/r rpm-changes" "$spec"
         done
 
+        rm -f rpm-changes
+
         for deb in debian/ debs/cloud-info-provider-opennebula/debian/ debs/cloud-info-provider-openstack/debian/ ; do
             pkg=$(head -1 "$deb/changelog" | cut -f1 -d" ")
             {
@@ -62,6 +64,8 @@ jobs:
             cat debian-changes "$deb/changelog" > "$deb/changelog.new"
             mv "$deb/changelog.new" "$deb/changelog"
         done
+
+        rm -f debian-changes
 
         zenodo_changes=$(echo "${{ steps.changelog.outputs.changes }}" | \
                          pandoc --from gfm --to html | \
@@ -86,4 +90,3 @@ jobs:
         labels: release
         branch: release-${{ steps.changelog.outputs.version }}
         title: Release  ${{ steps.changelog.outputs.version }}
-
