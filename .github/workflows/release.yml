@@ -5,6 +5,18 @@ on:
     types: [closed]
 
 jobs:
+  debug:
+    name: debug 
+    runs-on: ubuntu-latest
+    steps:
+    - name: cool 
+      run: |
+        echo "${{ github.event.pull_request.labels }}"
+        echo "${{ github.event.pull_request.merged }}"
+        echo "${{ github.event.pull_request.merged == true }}"
+        echo "${{ contains(github.event.pull_request.labels, 'release') }}"
+        echo "${{ github.event.pull_request.merged == true && contains(github.event.pull_request.labels, 'release') }}"
+
   prepare-release:
     name: Prepare Release
     runs-on: ubuntu-latest
