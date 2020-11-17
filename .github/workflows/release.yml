@@ -10,7 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: cool 
+      env:
+         GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: 
       run: |
+        echo "$GITHUB_CONTEXT"
         echo "${{ github.event.pull_request.labels[0] }}"
         echo "${{ github.event.pull_request.merged }}"
         echo "${{ github.event.pull_request.merged == true }}"
