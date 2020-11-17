@@ -17,8 +17,8 @@ jobs:
         echo "${{ github.event.pull_request.labels[0] }}"
         echo "${{ github.event.pull_request.merged }}"
         echo "${{ github.event.pull_request.merged == true }}"
-        echo "${{ contains(github.event.pull_request.labels, 'release') }}"
-        echo "${{ github.event.pull_request.merged == true && contains(github.event.pull_request.labels, 'release') }}"
+        echo "${{ contains(github.event.pull_request.labels.*.name, 'release') }}"
+        echo "${{ github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'release') }}"
 
   prepare-release:
     name: Prepare Release
