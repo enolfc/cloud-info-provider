@@ -9,7 +9,7 @@ jobs:
     name: Prepare Release
     runs-on: ubuntu-latest
     #if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels, 'release')
-    if: contains(github.event.pull_request.labels, 'release')
+    if: ${{ contains(github.event.pull_request.labels, 'release') }}
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
