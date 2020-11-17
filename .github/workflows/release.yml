@@ -11,7 +11,7 @@ jobs:
     steps:
     - name: cool 
       run: |
-        echo "${{ github.event.pull_request.labels }}"
+        echo "${{ github.event.pull_request.labels[0] }}"
         echo "${{ github.event.pull_request.merged }}"
         echo "${{ github.event.pull_request.merged == true }}"
         echo "${{ contains(github.event.pull_request.labels, 'release') }}"
