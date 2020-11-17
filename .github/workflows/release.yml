@@ -5,26 +5,10 @@ on:
     types: [closed]
 
 jobs:
-  debug:
-    name: debug 
-    runs-on: ubuntu-latest
-    steps:
-    - name: cool 
-      env:
-         GITHUB_CONTEXT: ${{ toJson(github) }}
-      run: |
-        echo "$GITHUB_CONTEXT"
-        echo "${{ github.event.pull_request.labels[0] }}"
-        echo "${{ github.event.pull_request.merged }}"
-        echo "${{ github.event.pull_request.merged == true }}"
-        echo "${{ contains(github.event.pull_request.labels.*.name, 'release') }}"
-        echo "${{ github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'release') }}"
-
   prepare-release:
     name: Prepare Release
     runs-on: ubuntu-latest
-    #if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels, 'release')
-    if: ${{ contains(github.event.pull_request.labels, 'release') }}
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'release')
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
