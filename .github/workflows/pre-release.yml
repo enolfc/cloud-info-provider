@@ -4,26 +4,24 @@ on:
   repository_dispatch:
     types: [release]
 
+permissions:
+  pull-requests: write
+  contents: write
+
 jobs:
   prepare-release:
     name: Prepare Release
     runs-on: ubuntu-latest
-    container: ubuntu:bionic
+    container: ubuntu:latest
     steps:
     - name: install packages
       run: |
-        apt-get update && apt-get install -y software-properties-common
-        add-apt-repository ppa:git-core/ppa
-        apt-get update && apt-get install -y git jq curl
+        apt-get update && apt-get install -y jq curl git
         # Need a new pandoc for markdown rendering below
         curl -L https://github.com/jgm/pandoc/releases/download/2.11.1.1/pandoc-2.11.1.1-1-amd64.deb > pandoc-2.11.1.1-1-amd64.deb
         apt-get install -y ./pandoc-2.11.1.1-1-amd64.deb
-    - uses: actions/checkout@v2
-    - uses: tibdex/github-app-token@v1
-      id: generate-token
-      with:
-        app_id: ${{ secrets.APP_ID }}
-        private_key: ${{ secrets.APP_PRIVATE_KEY }}
+        git config --global --add safe.directory "$GITHUB_WORKSPACE"
+    - uses: actions/checkout@v3
     - name: get git ready
       run: |
         git config user.name "egibot"
@@ -32,11 +30,13 @@ jobs:
       id: changelog
       run: |
         # this uses GNU sed -z!
-        version=$(grep "^## \[[0-9].*\]" CHANGELOG | head -1 | sed -e "s/^.*\[\(.*\)\]/\1/")
+        version=$(grep "^## \[[0-9].*\]" CHANGELOG | head -1 | sed -e "s/^.*\[\(.*\)\].*/\1/")
         changes=$(sed -e "/^## \[$version\]\$/,/^##/!d;//d;/^\$/d" CHANGELOG | \
                   sed -e "s/\%/%25/g" | sed -e "s/\r/%0D/" | sed -z -e "s/\n/%0A/g")
         echo "changes=$changes" >> "$GITHUB_OUTPUT"
         echo "version=$version" >> "$GITHUB_OUTPUT"
+
+        echo "$changes"
     - name: bump versions
       run: |
         {
@@ -82,7 +82,7 @@ jobs:
         mv .zenodo.json.new .zenodo.json
         git commit -a -m "Prepare version ${{ steps.changelog.outputs.version }}"
     - name: Create Pull Request for version
-      uses: peter-evans/create-pull-request@v3
+      uses: peter-evans/create-pull-request@v5
       with:
         delete-branch: true
         body: |
@@ -93,4 +93,3 @@ jobs:
         labels: release
         branch: release-${{ steps.changelog.outputs.version }}
         title: Release  ${{ steps.changelog.outputs.version }}
-        token: ${{ steps.generate-token.outputs.token }}
