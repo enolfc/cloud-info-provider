@@ -26,39 +26,43 @@ jobs:
       run: |
         git config user.name "egibot"
         git config user.email "egibot@egi.eu"
-    - name: Extract changelog
-      id: changelog
+    - name: Extract version
+      id: extract-version
       run: |
         # this uses GNU sed -z!
         version=$(grep "^## \[[0-9].*\]" CHANGELOG | head -1 | sed -e "s/^.*\[\(.*\)\].*/\1/")
-        changes=$(sed -e "/^## \[$version\]\$/,/^##/!d;//d;/^\$/d" CHANGELOG | \
-                  sed -e "s/\%/%25/g" | sed -e "s/\r/%0D/" | sed -z -e "s/\n/%0A/g")
-        echo "changes=$changes" >> "$GITHUB_OUTPUT"
         echo "version=$version" >> "$GITHUB_OUTPUT"
-
-        echo "$changes"
+    - name: Extract changelog
+      id: extract-changelog
+      uses: sean0x42/markdown-extract@v2
+      with:
+        file: CHANGELOG
+        pattern: ${{ steps.extact-version.outputs.version }}
+        no-print-matched-heading: true
     - name: bump versions
       run: |
+        # rpms
         {
            echo -n "* $(date '+%a %b %d %Y') "
            echo -n "$(git config user.name) <$(git config user.email)> "
-           echo "${{ steps.changelog.outputs.version }}"
-           echo "${{ steps.changelog.outputs.changes }}" | sed '/^[[:space:]]*$/d'
+           echo "${{ steps.extract-version.outputs.version }}"
+           echo "${{ steps.extract-changelog.outputs.markdown}}"
         } > rpm-changes
 
         for spec in rpm/*.spec; do
-            sed -i -e "s/^\(Version.\).*/\\1 ${{ steps.changelog.outputs.version }}/" "$spec"
+            sed -i -e "s/^\(Version.\).*/\\1 ${{ steps.exxtract-version.outputs.version }}/" "$spec"
             sed -i -e "/%changelog/r rpm-changes" "$spec"
         done
 
         rm -f rpm-changes
 
+        # debs
         for deb in debian/ debs/cloud-info-provider-opennebula/debian/ debs/cloud-info-provider-openstack/debian/ ; do
             pkg=$(head -1 "$deb/changelog" | cut -f1 -d" ")
             {
                 echo "$pkg (${{ steps.changelog.outputs.version }}-1) xenial; urgency=medium"
                 echo ""
-                echo "${{ steps.changelog.outputs.changes }}" | \
+                echo "${{ steps.extract-changelog.outputs.markdown}}" | \
                     sed -e "s/^-/*/" | sed -e "s/^/ /" | sed '/^[[:space:]]*$/d'
                 echo ""
                 echo " -- $(git config user.name) <$(git config user.email)> $(date -R)"
@@ -70,26 +74,28 @@ jobs:
 
         rm -f debian-changes
 
-        zenodo_changes=$(echo "${{ steps.changelog.outputs.changes }}" | \
+        # Zenodo
+        zenodo_changes=$(echo "${{ steps.extract-changelog.outputs.markdown}}" | \
                          pandoc --from gfm --to html | \
                          tr -s "\n" " ")
 
-        jq ".version = \"${{ steps.changelog.outputs.version }}\" | \
-            .title = \"EGI-Federation/cloud-info-provider: ${{ steps.changelog.outputs.version }}\" | \
-            .related_identifiers[0].identifier = \"https://github.com/EGI-Federation/cloud-info-provider/tree/${{ steps.changelog.outputs.version }}\" | \
+        jq ".version = \"${{ steps.extract-version.outputs.version }}\" | \
+            .title = \"EGI-Federation/cloud-info-provider: ${{ steps.extract-version.outputs.version }}\" | \
+            .related_identifiers[0].identifier = \"https://github.com/EGI-Federation/cloud-info-provider/tree/${{ steps.extract-version.outputs.version }}\" | \
             .publication_date = \"$(date '+%Y-%m-%d')\" | \
             .description = \"$zenodo_changes\"" < .zenodo.json > .zenodo.json.new
         mv .zenodo.json.new .zenodo.json
-        git commit -a -m "Prepare version ${{ steps.changelog.outputs.version }}"
+
+        git commit -a -m "Prepare version ${{ steps.extract-version.outputs.version }}"
     - name: Create Pull Request for version
       uses: peter-evans/create-pull-request@v5
       with:
         delete-branch: true
         body: |
-          Prepares release ${{ steps.changelog.outputs.version }}
+          Prepares release ${{ steps.extract-version.outputs.version }}
 
           Update RPM and DEB package descriptions and .zenodo.json for
-          version ${{  steps.changelog.outputs.version }}
+          version ${{  steps.extract-version.outputs.version }}
         labels: release
-        branch: release-${{ steps.changelog.outputs.version }}
-        title: Release  ${{ steps.changelog.outputs.version }}
+        branch: release-${{ steps.extract-version.outputs.version }}
+        title: Release  ${{ steps.extract-version.outputs.version }}
