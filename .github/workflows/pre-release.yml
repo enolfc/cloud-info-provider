@@ -60,7 +60,7 @@ jobs:
         rm -f rpm-changes
 
         # debs
-        for deb in debian/ debs/cloud-info-provider-opennebula/debian/
+        for deb in debian/ debs/cloud-info-provider-opennebula/debian/ \
                    debs/cloud-info-provider-openstack/debian/ ; do
             pkg=$(head -1 "$deb/changelog" | cut -f1 -d" ")
             {
