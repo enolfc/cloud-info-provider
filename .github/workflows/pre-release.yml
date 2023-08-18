@@ -19,7 +19,8 @@ jobs:
       run: |
         apt-get update && apt-get install -y jq curl git
         # Need a new pandoc for markdown rendering below
-        curl -L https://github.com/jgm/pandoc/releases/download/2.11.1.1/pandoc-2.11.1.1-1-amd64.deb > pandoc-2.11.1.1-1-amd64.deb
+        curl -L https://github.com/jgm/pandoc/releases/download/2.11.1.1/pandoc-2.11.1.1-1-amd64.deb \
+          > pandoc-2.11.1.1-1-amd64.deb
         apt-get install -y ./pandoc-2.11.1.1-1-amd64.deb
         git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - uses: actions/checkout@v3
@@ -31,7 +32,8 @@ jobs:
       id: extract-version
       run: |
         # this uses GNU sed -z!
-        version=$(grep "^## \[[0-9].*\]" CHANGELOG | head -1 | sed -e "s/^.*\[\(.*\)\].*/\1/")
+        version=$(grep "^## \[[0-9].*\]" CHANGELOG | \
+                  head -1 | sed -e "s/^.*\[\(.*\)\].*/\1/")
         echo "version=$version" >> "$GITHUB_OUTPUT"
     - name: Extract changelog
       id: extract-changelog
@@ -51,17 +53,19 @@ jobs:
         } > rpm-changes
 
         for spec in rpm/*.spec; do
-            sed -i -e "s/^\(Version.\).*/\\1 ${{ steps.exxtract-version.outputs.version }}/" "$spec"
+            sed -i -e "s/^\(Version.\).*/\\1 ${{ steps.extract-version.outputs.version }}/" "$spec"
             sed -i -e "/%changelog/r rpm-changes" "$spec"
         done
 
         rm -f rpm-changes
 
         # debs
-        for deb in debian/ debs/cloud-info-provider-opennebula/debian/ debs/cloud-info-provider-openstack/debian/ ; do
+        for deb in debian/ debs/cloud-info-provider-opennebula/debian/
+                   debs/cloud-info-provider-openstack/debian/ ; do
             pkg=$(head -1 "$deb/changelog" | cut -f1 -d" ")
             {
-                echo "$pkg (${{ steps.changelog.outputs.version }}-1) xenial; urgency=medium"
+                echo "$pkg (${{ steps.changelog.outputs.version }}-1) \
+                      xenial; urgency=medium"
                 echo ""
                 echo "${{ steps.extract-changelog.outputs.markdown}}" | \
                     sed -e "s/^-/*/" | sed -e "s/^/ /" | sed '/^[[:space:]]*$/d'
@@ -76,9 +80,8 @@ jobs:
         rm -f debian-changes
 
         # Zenodo
-        zenodo_changes=$(echo "${{ steps.extract-changelog.outputs.markdown}}" | \
-                         pandoc --from gfm --to html | \
-                         tr -s "\n" " ")
+        zenodo_changes=$(echo "${{ steps.extract-changelog.outputs.markdown}}" \
+                         | pandoc --from gfm --to html | tr -s "\n" " ")
 
         jq ".version = \"${{ steps.extract-version.outputs.version }}\" | \
             .title = \"EGI-Federation/cloud-info-provider: ${{ steps.extract-version.outputs.version }}\" | \
@@ -92,7 +95,7 @@ jobs:
       uses: peter-evans/create-pull-request@v5
       with:
         delete-branch: true
-        body: |
+        body: >
           Prepares release ${{ steps.extract-version.outputs.version }}
 
           Update RPM and DEB package descriptions and .zenodo.json for
