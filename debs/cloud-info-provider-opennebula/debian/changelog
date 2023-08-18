@@ -1,3 +1,8 @@
+python-cloud-info-provider-opennebula (0.13.0-1) xenial; urgency=medium
+
+
+ -- egibot <egibot@egi.eu> Fri, 18 Aug 2023 13:15:06 +0000
+
 python-cloud-info-provider-opennebula (0.12.2-1) xenial; urgency=medium
 
  * Support crendential refresh without client secret (#222) (Enol Fernández)

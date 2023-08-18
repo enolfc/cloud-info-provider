@@ -4,7 +4,7 @@
 
 Summary: Cloud Information provider meta-package for OpenNebula
 Name: cloud-info-provider-opennebula
-Version: 0.12.2
+Version: 0.13.0
 Release: 1%{?dist}
 Group: Applications/Internet
 License: Apache Software License 2.0
@@ -23,6 +23,7 @@ Install the cloud-information-provider and the Cloud Middleware dependencies.
 %files
 
 %changelog
+* Fri Aug 18 2023 egibot <egibot@egi.eu> 0.13.0
 * Mon May 17 2021 egibot <egibot@egi.eu> 0.12.2
 - Support crendential refresh without client secret (#222) (Enol Fernández)
 - Add --ignore-share-errors to continue publishing data even if there are
