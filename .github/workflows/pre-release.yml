@@ -1,3 +1,4 @@
+---
 name: Prepare new release as PR
 
 on:
@@ -37,7 +38,7 @@ jobs:
       uses: sean0x42/markdown-extract@v2
       with:
         file: CHANGELOG
-        pattern: ${{ steps.extact-version.outputs.version }}
+        pattern: ${{ steps.extract-version.outputs.version }}
         no-print-matched-heading: true
     - name: bump versions
       run: |
