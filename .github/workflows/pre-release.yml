@@ -48,8 +48,8 @@ jobs:
         {
            echo -n "* $(date '+%a %b %d %Y') "
            echo -n "$(git config user.name) <$(git config user.email)> "
-           echo "${{ steps.extract-version.outputs.version }}"
-           echo "${{ steps.extract-changelog.outputs.markdown}}"
+           echo '${{ steps.extract-version.outputs.version }}'
+           echo '${{ steps.extract-changelog.outputs.markdown}}'
         } > rpm-changes
 
         for spec in rpm/*.spec; do
@@ -67,7 +67,7 @@ jobs:
                 echo "$pkg (${{ steps.changelog.outputs.version }}-1) \
                       xenial; urgency=medium"
                 echo ""
-                echo "${{ steps.extract-changelog.outputs.markdown}}" | \
+                echo '${{ steps.extract-changelog.outputs.markdown}}' | \
                     sed -e "s/^-/*/" | sed -e "s/^/ /" | sed '/^[[:space:]]*$/d'
                 echo ""
                 echo " -- $(git config user.name) <$(git config user.email)> $(date -R)"
@@ -80,7 +80,7 @@ jobs:
         rm -f debian-changes
 
         # Zenodo
-        zenodo_changes=$(echo "${{ steps.extract-changelog.outputs.markdown}}" \
+        zenodo_changes=$(echo '${{ steps.extract-changelog.outputs.markdown}}' \
                          | pandoc --from gfm --to html | tr -s "\n" " ")
 
         jq ".version = \"${{ steps.extract-version.outputs.version }}\" | \
