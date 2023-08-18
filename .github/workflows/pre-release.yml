@@ -87,7 +87,7 @@ jobs:
             .title = \"EGI-Federation/cloud-info-provider: ${{ steps.extract-version.outputs.version }}\" | \
             .related_identifiers[0].identifier = \"https://github.com/EGI-Federation/cloud-info-provider/tree/${{ steps.extract-version.outputs.version }}\" | \
             .publication_date = \"$(date '+%Y-%m-%d')\" | \
-            .description = \"$zenodo_changes\"" < .zenodo.json > .zenodo.json.new
+            .description = '"$zenodo_changes"'" < .zenodo.json > .zenodo.json.new
         mv .zenodo.json.new .zenodo.json
 
         git commit -a -m "Prepare version ${{ steps.extract-version.outputs.version }}"
