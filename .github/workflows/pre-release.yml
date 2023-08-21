@@ -64,11 +64,11 @@ jobs:
                      debs/cloud-info-provider-openstack/debian/ ; do
               pkg=$(head -1 "$deb/changelog" | cut -f1 -d" ")
               {
-                  echo "$pkg (${{ steps.changelog.outputs.version }}-1) \
+                  echo "$pkg (${{ steps.extract-version.outputs.version }}-1) \
                         xenial; urgency=medium"
                   echo ""
                   echo '${{ steps.extract-changelog.outputs.markdown}}' | \
-                      sed -e "s/^-/*/" | sed -e "s/^/ /" | sed '/^[[:space:]]*$/d'
+                      sed -e "s/^-/*/" | sed -e "s/^/  /" | sed '/^[[:space:]]*$/d'
                   echo ""
                   echo " -- $(git config user.name) <$(git config user.email)> $(date -R)"
                   echo ""
