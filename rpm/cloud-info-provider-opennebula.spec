@@ -23,6 +23,20 @@ Install the cloud-information-provider and the Cloud Middleware dependencies.
 %files
 
 %changelog
+* Tue Aug 22 2023 egibot <egibot@egi.eu> 0.13.0
+### Added
+- Add flavor name to templates (#231) (Enol Fernández)
+- Support sites with URLs in the endpoints of GOCDB (#234) (Enol Fernández)
+- Add new providers: AWS, Mesos and onedata (#237) (Pablo Orviz, Enol Fernández)
+- Support regions in OpenStack (#229) (Enol Fernández)
+- Add support for infiniband & GPUs in OpenStack (#237, #240) (Pablo Orviz, Enol Fernández)
+
+### Fixed
+- Update GitHub Actions syntax (#234) (Enol Fernández)
+- Remove `/` from VO names (#230) (Enol Fernández)
+- Use main as default branch (#236) (Enol Fernández)
+- Improved CMDB templates (#237) (Pablo Orviz)
+
 * Mon Aug 21 2023 egibot <egibot@egi.eu> 0.13.0
 ### Added
 - Add flavor name to templates (#231) (Enol Fernández)
