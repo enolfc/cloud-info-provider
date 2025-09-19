@@ -35,7 +35,6 @@ jobs:
           file: CHANGELOG.md
           pattern: ${{ steps.extract-version.outputs.version }}
           no-print-matched-heading: true
-          name: rpms
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@6cbd405e2c4e67a21c47fa9e383d020e4e28b836 # v2.3.3
