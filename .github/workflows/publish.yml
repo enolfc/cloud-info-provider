@@ -5,7 +5,7 @@ on:
   release:
     types: [released]
 
-permissions: read-all
+permissions: {}
 
 jobs:
   build:
