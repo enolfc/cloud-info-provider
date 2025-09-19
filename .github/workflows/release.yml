@@ -39,6 +39,6 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@6cbd405e2c4e67a21c47fa9e383d020e4e28b836 # v2.3.3
         with:
-          tag_name: ${{ steps.extract-version.outputs.version }}
+          tag_name: v${{ steps.extract-version.outputs.version }}
           name: Release ${{ steps.extract-version.outputs.version }}
           body: "${{ steps.extract-changelog.outputs.changelog }}"
