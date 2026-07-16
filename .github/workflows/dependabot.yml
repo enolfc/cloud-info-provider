@@ -10,7 +10,7 @@ jobs:
   dependabot:
     runs-on: ubuntu-latest
 
-    #if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'EGI-Federation/cloud-info-provider'
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'enolfc/cloud-info-provider'
     steps:
       - name: Fetch Dependabot metadata
         id: dependabot-metadata
